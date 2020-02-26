@@ -10,6 +10,8 @@
 #include "Adafruit_Sensor.h"
 #include "DHT.h"
 #include "DHT_U.h"
+#include <ESP8266WiFi.h>          // ESP8266 base Wi-Fi library 
+#include <ESP8266WebServer.h>     // WebServer library
 
 #define DHTPIN 5     // Digital pin connected to the DHT sensor 
 // Feather HUZZAH ESP8266 note: use pins 3, 4, 5, 12, 13 or 14 --
@@ -24,6 +26,8 @@
 //   https://learn.adafruit.com/dht/overview
 
 DHT_Unified dht(DHTPIN, DHTTYPE);
+ESP8266WebServer server(80);      // create a server at port 80
+unsigned long previousMillis;
 
 uint32_t delayMS;
 
@@ -59,6 +63,8 @@ float computeHeatIndex(float temperature, float percentHumidity,bool isFahrenhei
 
 void setup() {
   Serial.begin(9600);
+  StartWifi();
+  startServer();
   pinMode(D2,OUTPUT);
   pinMode(D0,OUTPUT);
   // Initialize device.
@@ -99,6 +105,7 @@ float temp;
 */
 void loop() {
   sensors_event_t event;
+  server.handleClient(); 
   dht.temperature().getEvent(&event);
   if (isnan(event.temperature)){
     Serial.println("couldn't read temp.");
@@ -119,16 +126,20 @@ void loop() {
   Serial.print("rel_ hum: ");Serial.println(rel_h);
   Serial.print("temp ");Serial.println(temp);
   
-  if(hd>10){
-   Serial.println("BUZZZ");
-    digitalWrite(D2,1);
-    delay(1000);
-    digitalWrite(D2,0);
+  const long interval = 1000;   
+  unsigned long currentMillis = millis();
+  if (currentMillis - previousMillis >= interval) {
+    // save the last time you blinked the LED
+    previousMillis = currentMillis;
+    // if the LED is off turn it on and vice-versa:
+    if (hd>10) {
+      Serial.println("BUZZZ");
+      Serial.println("LEEDD");
+      digitalWrite(D2,1);
+      digitalWrite(D0,1);
+    } else {
+      digitalWrite(D2,0);
+      digitalWrite(D0,0);
+    }
   }
- if(hd>10){
-   Serial.println("LEEDD");
-    digitalWrite(D0,1);
-    delay(1000);
-    digitalWrite(D0,0);
- }
 }
