@@ -60,6 +60,7 @@ float computeHeatIndex(float temperature, float percentHumidity,bool isFahrenhei
 void setup() {
   Serial.begin(9600);
   pinMode(D2,OUTPUT);
+  pinMode(D0,OUTPUT);
   // Initialize device.
   dht.begin();
   Serial.println(F("DHTxx Unified Sensor Example"));
@@ -124,4 +125,10 @@ void loop() {
     delay(1000);
     digitalWrite(D2,0);
   }
+ if(hd>10){
+   Serial.println("LEEDD");
+    digitalWrite(D0,1);
+    delay(1000);
+    digitalWrite(D0,0);
+ }
 }
