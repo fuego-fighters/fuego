@@ -1,7 +1,7 @@
 
 
-#define SSID "HOME"               // Wi-Fi Access point SSID
-#define PASSWORD "home2home"       // Wi-Fi password
+#define SSID "Redmi"               // Wi-Fi Access point SSID
+#define PASSWORD "helloworld"       // Wi-Fi password
 
 
 // callback function that is called by Web server in case if /ajax_input?LED=1&LED2=...
@@ -15,9 +15,20 @@ void ajaxInputs() {
   server.send(200, "text/html",htmlBuff);       // 200 - means Success html result code
 }
 
+
+void ajaxFire() {
+  server.sendHeader("Connection", "close");                         // Headers to free connection ASAP and 
+  server.sendHeader("Cache-Control", "no-store, must-revalidate");  // Don't cache response
+  if (hd>heatindex_alert){
+    server.send(200, "text/html","fire");  
+  }else{
+    server.send(200,"text/html","ok");
+  }
+}
 // callback function that is called by Web server if no sutable callback function fot URL found
 void startServer(){
     server.on("/ajax", HTTP_GET, ajaxInputs);
+    server.on("/af", HTTP_GET, ajaxFire); //on fire AF ya sa7beeeeeeetttttyyyyyyy
     server.on("/", HTTP_GET, indexf);
     server.on("/Room1.html", HTTP_GET, room1);
     server.on("/Room2.html", HTTP_GET, room2);
