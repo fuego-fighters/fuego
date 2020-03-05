@@ -13,7 +13,7 @@
 #include <ESP8266WiFi.h>          // ESP8266 base Wi-Fi library 
 #include <ESP8266WebServer.h>     // WebServer library
 #include <FS.h>    
-#define heatindex_alert 15
+#define heatindex_alert 32
 #define DHTPIN 5     // Digital pin connected to the DHT sensor 
 // Feather HUZZAH ESP8266 note: use pins 3, 4, 5, 12, 13 or 14 --
 // Pin 15 can work but DHT must be disconnected during program upload.
@@ -72,6 +72,7 @@ void setup() {
   }
   pinMode(D2,OUTPUT);
   pinMode(D0,OUTPUT);
+  pinMode(D7,OUTPUT);
   // Initialize device.
   dht.begin();
   Serial.println(F("DHTxx Unified Sensor Example"));
@@ -100,6 +101,7 @@ void setup() {
   // Set delay between sensor readings based on sensor details.
   delayMS = sensor.min_delay / 1000;
   delay(5000);
+  digitalWrite(D7,HIGH);
 }
 
 float hd;
@@ -128,9 +130,7 @@ void loop() {
   }else{
     hd=computeHeatIndex(temp,rel_h);
   }
-  Serial.print("Heat Index: ");Serial.println(hd);
-  Serial.print("rel_ hum: ");Serial.println(rel_h);
-  Serial.print("temp ");Serial.println(temp);
+
   
   const long interval = 1000;   
   unsigned long currentMillis = millis();
@@ -138,6 +138,9 @@ void loop() {
     // save the last time you blinked the LED
     previousMillis = currentMillis;
     // if the LED is off turn it on and vice-versa:
+    Serial.print("Heat Index: ");Serial.println(hd);
+    Serial.print("rel_ hum: ");Serial.println(rel_h);
+    Serial.print("temp ");Serial.println(temp);
     if (hd>heatindex_alert) {
       Serial.println("BUZZZ");
       Serial.println("LEEDD");
