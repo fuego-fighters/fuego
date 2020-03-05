@@ -12,6 +12,7 @@
 #include "DHT_U.h"
 #include <ESP8266WiFi.h>          // ESP8266 base Wi-Fi library 
 #include <ESP8266WebServer.h>     // WebServer library
+#include <FS.h>    
 
 #define DHTPIN 5     // Digital pin connected to the DHT sensor 
 // Feather HUZZAH ESP8266 note: use pins 3, 4, 5, 12, 13 or 14 --
@@ -65,6 +66,10 @@ void setup() {
   Serial.begin(9600);
   StartWifi();
   startServer();
+  if (!SPIFFS.begin()) {
+        Serial.println("ERROR - File system initialization failed!");
+        return;    // init failed
+  }
   pinMode(D2,OUTPUT);
   pinMode(D0,OUTPUT);
   // Initialize device.
@@ -94,6 +99,7 @@ void setup() {
   Serial.println(F("------------------------------------"));
   // Set delay between sensor readings based on sensor details.
   delayMS = sensor.min_delay / 1000;
+  delay(5000);
 }
 
 float hd;
@@ -112,7 +118,7 @@ void loop() {
   }else{
     temp=event.temperature;
   }
-  if(isnan(event.relative_humidity)){
+  if(isnan(event.relative_humidity)){ //Why is the relative humidaity the same as temp? 21.90? just a weird fluke?
     Serial.println("couldn't read hum.");
   }else{
     rel_h=event.relative_humidity;
